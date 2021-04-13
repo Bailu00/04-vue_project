@@ -6,13 +6,14 @@ import './plugins/element.js'
 import './assets/css/global.css'
 //axios 为包的时候这种挂载方式
 import axios from 'axios'
-
+import ElementUI from 'element-ui';
 Vue.config.productionTip = false
 //配置请求的根路径
 axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1'
 //包挂载到vue原型对象上,http为ajax请求
 Vue.prototype.$http = axios
-
+Vue.use(ElementUI)
+console.log('master')
 
 new Vue({
   router,
