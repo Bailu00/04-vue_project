@@ -2,6 +2,8 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from '../components/Login.vue'
 import Home from '../components/Home.vue'
+import Welcome from '../components/Welcome.vue'
+import Users from '../components/user/Users.vue'
 
 Vue.use(VueRouter)
 
@@ -17,7 +19,15 @@ const router = new VueRouter({
   routes: [
   {path:'/', redirect:'/login'},
   {path:'/login', component:Login},
-  {path:'/Home', component:Home}
+  {
+    path:'/Home', 
+    component:Home, 
+    redirect:'/welcome',
+    children: [
+      {path:'/welcome', component:Welcome},
+      {path:'/users', component:Users}
+    ]
+  }
 ]
 })
 
@@ -25,17 +35,17 @@ const router = new VueRouter({
 //为router调用一个beforeEach函数，beforeEach接收一个回调函数，回调函数中有三个参数(to,from,next)
 //to代表将要访问的路径，from代表从哪个路径跳转过来，
 //next是一个函数，表示放行；next()表示直接放行，next('/login')强制跳转
+ router.beforeEach((to, from, next) => {
+   if (to.path === '/login') return next(); //to.path === '/login'表示用户要访问登录也，登陆也不需要做权限控制，直接放行
 
-// router.beforeEach((to, from, next) => {
-//   if(to.path === '/login') return next(); //登陆也不需要做权限控制，直接放行
-
-  //如果没有被return出去，表示用户访问的不是登陆页，而是有权限的页面，先拿到taken，
-  //根据是否有taken再决定是否发生强制跳转
-  //获得taken值
-//   const takenstr = window.sessionStorage.getItem('taken')
-//   if(!takenstr) return next('/login')
-//   next()
-// })
+  //如果没有被return出去，表示用户访问的不是登陆页，而是有权限的页面，先拿到token，
+  //根据是否有token再决定是否发生强制跳转
+  //从sessionStorage 中获取保存的token 值
+   const tokenstr = window.sessionStorage.getItem('token')
+  //没有token，强制调转到登录页面
+   if(!tokenstr) return next('/login')
+   next()
+ })
 
 export default router
 

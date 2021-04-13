@@ -44,8 +44,8 @@ export default {
     return{
       //这是登陆表单的数据绑定对象
       loginForm:{
-        username:'',  //默认为空
-        password:''
+        username:'admin',  //默认为空
+        password:'123456'
       },
       //这是表单的验证规则对象
       loginFormRules:{
@@ -65,7 +65,7 @@ export default {
     resetLoginForm(){
       this.$refs.loginFormRfef.resetFields();
     },
-    login(){
+    login() {
       // validate接收一个回调函数从而获得验证结果,valid为判断结果，为Boolean值，当只有一个参数时，小括号可以取消
       //如果为false不发起请求，如果为true可以发起登陆请求
       this.$refs.loginFormRfef.validate(async valid => {
@@ -85,21 +85,22 @@ export default {
 
         //结果为具体的响应对象，包含6个属性，这6个属性时axios帮我们封装好的，其中data才是服务器返回的真实数据
         //可以从对象身上将data属性解构赋值出来，{data：res} data属性，重命名为res
-        const {data: res} = await this.$http.post("login", this.loginForm);
+        const {data:res} = await this.$http.post("login", this.loginForm);
         // console.log(res); //res为真实的服务器数据
-        if(res.meta.status != 200) return this.$message.console.error("登陆失败"); // error表示弹出错误的提示框
-        this.$message.success("登陆成功");
+
+         if(res.meta.status !== 200) return this.$message.error("登陆失败"); // error表示弹出错误的提示框
+         this.$message.success("登陆成功");
 
         //1.将登陆成功之后的taken，保存到客户端的sessionStorage中
         //1.1 项目中除了登陆之外的其他API接口，必须在登陆之后才能访问,taken是登陆后服务器颁发给我们的令牌/身份认证信息
         //在访问时，携带taken，一定可以访问成功，localStorage，是持久化的存储机制，而sessionStorage是回话期间的存储机制
         //taken只在当前网站打开时生效，故存储在sessionStorage中
         //1.2 token 只应在当前网站打开期间生效，所以讲taken保存在sessionStorage中
-        //将taken保存到sessionstorage中,(括号值为键值对)
-        window.sessionStorage.setItem("taken", res.data.taken)
+        //将taken保存到sessionstorage中,(括号值为键值对,taken为键，res.data.taken为值)
+          window.sessionStorage.setItem("token", res.data.token)
 
         //2.通过编程式导航调转到后台主页$router.push方法，路由地址是/home
-        this.$router.push("/home")
+         this.$router.push("/home")
         
         
       })
