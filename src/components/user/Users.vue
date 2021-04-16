@@ -84,6 +84,7 @@
                 type="warning"
                 icon="el-icon-setting"
                 size="mini"
+                @click="setRole(scope.row)"
               ></el-button>
             </el-tooltip>
           </template>
@@ -172,6 +173,38 @@
         <el-button type="primary" @click="editUserInfo">确 定</el-button>
       </span>
     </el-dialog>
+    <!-- 分配角色的对话框 -->
+    <el-dialog
+      title="分配角色"
+      :visible.sync="setRoleDialogVisible"
+      width="50%"
+      @close="setRoleDialogClosed"
+    >
+      <p>当前的用户：{{ userInfo.username }}</p>
+      <p>当前的角色：{{ userInfo.role_name }}</p>
+      <!-- v-model="value"将用户选定的值，双向同步到data数据中；
+      每一个选项都需要手动的for循环，自动生成出来；
+      每一个for循环中，可以通过:label来指定你所能看到的这个名词；
+       :value指你选中之后，真正选中的value值-->
+      <p>
+        分配新角色：
+        <el-select v-model="selectedRoleId" placeholder="请选择">
+          <el-option
+            v-for="item in roleList"
+            :key="item.id"
+            :label="item.roleName"
+            :value="item.id"
+          >
+          </el-option>
+        </el-select>
+      </p>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="setRoleDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveRoleInfo"
+          >确 定</el-button
+        >
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -212,14 +245,20 @@ export default {
       total: 0,
       addDialogVisible: false, //控制添加用户对话框的显示与隐藏
       editDialogVisible: false, //控制修改对话框的显示与隐藏
-      deleteDialogVisible:false, //控制删除对话框的显示与隐藏
+      deleteDialogVisible: false, //控制删除对话框的显示与隐藏
       editForm: {}, //查询到的用户数据对象
+      //添加用户的表单数据
       addForm: {
         username: "",
         password: "",
         mail: "",
         mobile: "",
-      }, //添加用户的表单数据
+      },
+      //分配角色对话框的显示与隐藏
+      setRoleDialogVisible: false,
+      userInfo: "", //需要被分配角色的用户信息
+      roleList: "", //获得所有角色的数据列表
+      selectedRoleId:"",  //已选中的角色id值
       //添加表单的验证规则对象
       addFormRules: {
         username: [
@@ -228,7 +267,12 @@ export default {
         ],
         password: [
           { required: true, message: "请输入密码", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 6 到 15 个字符", trigger: "blur" },
+          {
+            min: 6,
+            max: 15,
+            message: "长度在 6 到 15 个字符",
+            trigger: "blur",
+          },
         ],
         email: [
           // 第一个规则，判断是否输入邮箱
@@ -323,6 +367,7 @@ export default {
         if (!valid) return;
         //如果验证成功，可以发起添加用户的网络请求
         const { data: res } = await this.$http.post("users", this.addForm);
+        console.log(res);
         if (res.meta.status !== 201) {
           this.$message.error("添加用户失败！");
         }
@@ -372,29 +417,63 @@ export default {
     },
     //根据id删除对应的用户信息
     async removeUserById(id) {
-      console.log(id)
+      console.log(id);
       // 弹框询问用户是否删除数据，this.$confirm的返回值是promise
-        const confirmResult = await this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).catch( err => err)
-        //如果用户确认删除，则返回值为字符串confirm。
-        //如果取消删除，则返回值为字符串cancel，用catch捕获这个消息,返回err的这个消息
-        // console.log(confirmResult)
-        if(confirmResult !== 'confirm') {
-          return this.$message.info("已取消删除")
+      const confirmResult = await this.$confirm(
+        "此操作将永久删除该用户, 是否继续?",
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
         }
-        const {data:res} = await this.$http.delete(`users/` + id);
-        if(res.meta.status !== 200){
-          return this.$message.error("删除用户失败")
-        }
-          return this.$message.success("删除用户成功!"),
-          this.getUserList()
-
+      ).catch((err) => err);
+      //如果用户确认删除，则返回值为字符串confirm。
+      //如果取消删除，则返回值为字符串cancel，用catch捕获这个消息,返回err的这个消息
+      // console.log(confirmResult)
+      if (confirmResult !== "confirm") {
+        return this.$message.info("已取消删除");
       }
+      const { data: res } = await this.$http.delete(`users/` + id);
+      if (res.meta.status !== 200) {
+        return this.$message.error("删除用户失败");
+      }
+      return this.$message.success("删除用户成功!"), this.getUserList();
+    },
+    //展示分配角色的对话框
+    async setRole(userInfo) {
+      this.userInfo = userInfo;
+      //在展示对话框之前，获取所有角色的列表
+      const { data: res } = await this.$http.get("roles");
+      if (res.meta.status !== 200) {
+        return this.$message.error("列表获取失败");
+      }
+      this.roleList = res.data;
+      this.setRoleDialogVisible = true;
+    },
+    //点击按钮，分配角色
+    async saveRoleInfo(){
+      // 先判断有无选择一个新的角色
+      if(!this.selectedRoleId){
+        return this.$message.error("请选择要分配的角色")
+      }
+      // 如果有选中，则保存这个角色
+      const {data:res} = await this.$http.put(`users/${this.userInfo.id}/role`,{rid: this.selectedRoleId})
+      if(res.meta.status !== 200){
+        this.$message.error("更新角色失败")
+      }
+      this.$message.success("更新角色成功")
+      //刷新当前的用户列表
+      this.getUserList()
+      
+      this.setRoleDialogVisible = false
+    },
+    //监听分配角色对话框的关闭事件
+    setRoleDialogClosed(){
+      this.selectedRoleId = ""
+      this.userInfo = {}
+    }
   },
-   
 };
 </script>
 
