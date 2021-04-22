@@ -20,3 +20,13 @@ html, body, #app {
 .el-pagination{
   margin-top: 15px;
 }
+.el-steps {
+  margin: 15px 0;
+}
+.el-step__title {
+  font-size: 13px;
+}
+/* min-height为最小高度 */
+.ql-editor {
+  min-height: 300px;
+}

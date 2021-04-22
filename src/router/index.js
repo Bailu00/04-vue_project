@@ -6,6 +6,12 @@ import Welcome from '../components/Welcome.vue'
 import Users from '../components/user/Users.vue'
 import Right from '../components/power/Right.vue'
 import Roles from '../components/power/Roles.vue'
+import Cate from '../components/good/Cate.vue'
+import Params from '../components/good/Params.vue'
+import List from '../components/good/List.vue'
+import Add from '../components/good/Add.vue'
+import Order from '../components/order/Order.vue'
+import Report from '../components/report/Report.vue'
 
 Vue.use(VueRouter)
 
@@ -30,7 +36,13 @@ const router = new VueRouter({
       {path:'/users', component:Users},
       //path：路径，component指对应的文档
       {path:'/rights', component:Right},
-      {path:'/roles', component:Roles}
+      {path:'/roles', component:Roles},
+      {path:'/categories', component:Cate},
+      {path:'/params', component:Params},
+      {path:'/goods', component:List},
+      {path:'/goods/add', component:Add},
+      {path:'/orders', component:Order},
+      {path:'/reports', component:Report}
     ]
   }
 ]

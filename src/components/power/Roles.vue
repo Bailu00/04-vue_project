@@ -92,6 +92,7 @@
             >
           </template>
         </el-table-column>
+        
       </el-table>
     </el-card>
 
@@ -212,7 +213,7 @@ export default {
         // const a=await this.$http.post("roles", this.addForm);
         const { data: res } = await this.$http.post("roles", this.addForm);
         if (res.meta.status !== 201) {
-          this.$message.error("添加角色失败");
+        return this.$message.error("添加角色失败");
         }
         // this.$message.success("添加角色成功");
         //新增完成后，刷新列表，重新获取列表
