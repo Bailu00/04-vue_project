@@ -95,7 +95,11 @@ export default {
         //1.1 项目中除了登陆之外的其他API接口，必须在登陆之后才能访问,taken是登陆后服务器颁发给我们的令牌/身份认证信息
         //在访问时，携带taken，一定可以访问成功，localStorage，是持久化的存储机制，而sessionStorage是回话期间的存储机制
         //taken只在当前网站打开时生效，故存储在sessionStorage中
+<<<<<<< HEAD
         //1.2 token 只应在当前网站打开期间生效，所以将token保存在sessionStorage中
+=======
+        //1.2 token 只应在当前网站打开期间生效，所以讲taken保存在sessionStorage中
+>>>>>>> user
         //将taken保存到sessionstorage中,(括号值为键值对,taken为键，res.data.taken为值)
           window.sessionStorage.setItem("token", res.data.token)
 

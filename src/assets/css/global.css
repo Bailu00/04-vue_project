@@ -2,6 +2,10 @@ html, body, #app {
   height: 100%;
   margin: 0;
   padding: 0;
+<<<<<<< HEAD
+=======
+  min-width: 1366px;
+>>>>>>> user
 }
 
 .el-breadcrumb {
@@ -18,4 +22,18 @@ html, body, #app {
 }
 .el-pagination{
   margin-top: 15px;
+<<<<<<< HEAD
 }
+=======
+}
+.el-steps {
+  margin: 15px 0;
+}
+.el-step__title {
+  font-size: 13px;
+}
+/* min-height为最小高度 */
+.ql-editor {
+  min-height: 300px;
+}
+>>>>>>> user
