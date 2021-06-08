@@ -68,8 +68,6 @@ Vue.filter('dateFormat', function(originVal){
  return `${y}-${m}-${d} ${hh}:${mm}:${ss}`
  })
 
->>>>>>> user
-
 new Vue({
   router,
   render: h => h(App)
